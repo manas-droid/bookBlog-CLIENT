@@ -4,7 +4,7 @@ import App from './App';
 import {setContext} from 'apollo-link-context';
 
 const httpLink = createHttpLink({
-uri : 'http://localhost:8000/graphql'
+uri : 'https://shielded-lake-20235.herokuapp.com/'
 })
 
 
