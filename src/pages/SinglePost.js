@@ -1,61 +1,65 @@
-import React , {useState,useContext,useEffect} from 'react';
-import {useQuery , useMutation} from '@apollo/client';
-import {SINGLE_POST , INSERT_COMMENT,INSERT_LIKES} from '../utils/GraphQl'
-import {AuthContext} from '../context/AuthContext';
-import CommentComponent from '../components/CommentComponent'
-import LikesComments from '../components/likesComments'
-import SummaryAndTitle from '../components/summaryAndTitle.js';
+
+import React , {useState} from "react";
+import { useQuery , useMutation } from '@apollo/client'
+import {SINGLE_POST , INSERT_COMMENT , GET_COMMENTS} from '../utils/GraphQl';
+import PostComponent from '../components/PostComponent'
+import CommentSection from '../components/CommentSection';
 
 function SinglePost(props){
-  const {user} = useContext(AuthContext);
+  const postId = parseInt(props.match.params.postId);
 
-  const id = (user) ? user.id : ' ';
-  const userName = (user) ? user.username : ' ';
+  const result= useQuery(SINGLE_POST , {
+    variables : {postId},
+  });
 
-  const postId = props.location.pathname.substring(7);
+const [comment , setComment] = useState('');
 
-  const{loading , errors  , data} = useQuery(SINGLE_POST , {
-    variables : {postId : postId }
-  })
+const [addPostComment ] = useMutation(INSERT_COMMENT , {
+
+ refetchQueries: [
+  {
+    query:GET_COMMENTS,
+    variables : {postId}
+  }
+]
+});
+
+  async function submitComment(e){
+    e.preventDefault();
+    await addPostComment({variables:{comment , postId}});
+  }
+
+  function onChangeComment(e){
+    setComment(e.target.value);
+  }
+
+const post = (result.data) ? result.data.getSinglePost : null;
 
 
-if(loading)
-    return <h1>loading ..</h1>;
+if(!post)
+  return <div>...Loading</div>
 
-
-    return(
-        <div>
-            {
-              data &&
-             <div className = 'commentDiv'>
-              <div className = "flex">
-                <SummaryAndTitle summary = {data.getPost.summary} image = {data.getPost.image} bookname = {data.getPost.bookname}/>
-
-                <LikesComments  username = {data.getPost.username} likeCount = {data.getPost.likeCount}
-                     commentsLength = {data.getPost.comments.length}  likes = {data.getPost.likes}
-                     history = {props.history}
-                    postId = {postId}
-                     />
-             </div>
+  return(
+    <div className="ui container text">
+      <PostComponent  {...post} {...props} came_from="singlePost"/>
+      <div id="container">
+        <h1>
+          {post.commentCount} Comments:
+        </h1>
+        <form class="ui reply form">
+          <div class="field">
+                <textarea rows="3"onChange = {onChangeComment} value = {comment} placeholder="Add a comment..."></textarea>
           </div>
-        }
-      <section className="commentDisplay">
-          <h3>
-            Check the reviews!
-          </h3>
+              <button className="ui icon primary button" onClick={submitComment}>
+                Add Comment
+              </button>
+        </form>
+            
+      </div>
+      <CommentSection  postId = {postId}/>
+    </div>
 
-          {
-            data && data.getPost && data.getPost.comments.length > 0 &&
-              data.getPost.comments.map(comment =>{
-                return  <CommentComponent  key={comment.id} {...comment } userName = {userName} postId = {postId} postAuthor = {data.getPost.username}/>
-              }) || <h1>Be the first to comment</h1>
-          }
-
-      </section>
-
-        </div>
-
-    )
+  )
 }
 
 export default SinglePost;

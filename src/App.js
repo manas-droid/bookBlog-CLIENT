@@ -11,29 +11,21 @@ import BookMark from './pages/BookMark'
 import EditPost from './pages/EditPost'
 import {AuthProvider} from './context/AuthContext';
 import {AuthRoute , LogRoute} from './utils/AuthRoute'
-
-import './utils/css/form.css'
-import './utils/css/menubar.css'
-import './utils/css/addposts.css'
-import './utils/css/home.css'
-import './utils/css/singlpost.css'
-
-
-
-
+import "./utils/color.css"
+import Sidebar from './components/SideBar'
 function App() {
   return (
     <AuthProvider>
     <Router>
         <MenuBar/>
+        <LogRoute exact path = '/login' component = {Login}/>
+        <LogRoute exact path = '/register' component={Register} />
         <Route exact path = '/' component={Home} />
         <Route exact path="/posts/:postId" component = {SinglePost} />
-        <AuthRoute path = '/login' component = {Login}/>
-        <AuthRoute exact path = '/register' component={Register} />
-        <LogRoute exact path='/add-posts' component={AddPosts} />
-        <LogRoute exact path='/your-posts' component={YourPosts} />
-        <LogRoute exact path="/your-bookmarks" component = {BookMark}/>
-        <LogRoute exact path = "/editPost" component = {EditPost} />
+        <AuthRoute exact path='/add-posts' component={AddPosts} />
+        <AuthRoute exact path='/your-posts' component={YourPosts} />
+        <AuthRoute exact path="/your-bookmarks" component = {BookMark}/>
+        <AuthRoute exact path = "/editPost" component = {EditPost} />
     </Router>
     </AuthProvider>
 

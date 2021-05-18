@@ -1,46 +1,62 @@
 import {Link , useLocation} from 'react-router-dom';
-import {useContext , useState} from 'react';
+import {useContext} from 'react';
+import {useMutation} from '@apollo/client';
 import {AuthContext} from '../context/AuthContext'
+import {LOGOUT , AUTH_ME} from '../utils/GraphQl';
+import 'semantic-ui-css/semantic.min.css';
+import {useAuth0} from "../utils/auth";
 
 function MenuBar(){
 
-  const context = useContext(AuthContext);
-  const [ class_name , setClassName] = useState("topnav");
+  const {user} = useContext(AuthContext);
+  const{isAuthenticated , loading:authLoading , loginWithRedirect} = useAuth0();
+
   const currentLocation = useLocation().pathname;
-  function handleClick(){
-    if(class_name == "topnav")
-      setClassName("topnav responsive");
-    else
-        setClassName("topnav");
+
+  console.log(currentLocation);
+
+  const [logOut ] = useMutation(LOGOUT , {
+    refetchQueries : [{
+      query : AUTH_ME
+    }]
+  });
+
+  async function handleLogOut (){
+    await logOut();
+
   }
+
+  const activeItem = 'home';
+
   return (
-      <header>
-          <div className={class_name} id="myTopnav">
-          <Link to='/'  className = {currentLocation == '/' ? 'activate' : ''}  >Home</Link>
-          <Link to = '/add-posts'   className = {currentLocation == '/add-posts' ? 'activate' : ''}             > Add a New Post </Link>
-          <Link to = '/your-bookmarks'  className = {currentLocation == '/your-bookmarks' ? 'activate' : ''}    > Your Bookmarks </Link>
-          <Link to = '/your-posts'   className = {currentLocation == '/your-posts' ? 'activate' : ''}           > Your Posts </Link>
-
-          {
-            !context.user &&
-            <Link to='/login' style = { (class_name == "topnav") ? {  float: "right" } : {}  }  className = {currentLocation == '/login' ? 'activate' : ''}  >Login</Link>
-          }
-
-          {
-            !context.user &&
-            <Link to='/register' style = { (class_name == "topnav") ? {  float: "right" } : {}  }  className = {(currentLocation == '/register') ? 'activate' : ''}  >Register</Link>
-          }
-
-          {
-            context.user &&
-              <Link to = '/' style = { (class_name == "topnav") ? {  float: "right" } : {}  } onClick = { () => { context.logout() }}> Logout </Link>
-          }
-            <Link to="#" className = "icon"   onClick = {handleClick}>
-              <i class="fa fa-bars"></i>
-            </Link>
-          </div>
-      </header>
-
-  )
+    <div className="ui inverted segment">
+    <div className="ui inverted pointing secondary menu">
+      <Link className={`item ${currentLocation === "/" ? "active" : ""}`} to="/">Home</Link>
+      <Link className={`item ${currentLocation === "/add-posts" ? "active" : ""}`} to="/add-posts">Add a Post</Link>
+      <Link className={`item ${currentLocation === '/your-bookmarks'  ? "active" : ""}`} to="/your-bookmarks">Your bookmarks</Link>
+      <Link to = '/your-posts'   className = {currentLocation === '/your-posts' ? 'item active' : 'item'}> Your Posts </Link>
+      <div className="right menu">
+        
+       { 
+         !user && (  
+          <Link className={`item ${currentLocation==='/register' ? "active" : ""}`} to="/register">Sign Up</Link>
+         )
+        }
+      {
+        !user && (
+          <Link className={`item ${currentLocation==='/login' ? "active" : ""}`} onClick = {loginWithRedirect}>Login</Link>
+        )
+      }  
+      
+      {
+        user &&
+        (
+          <Link to="/" className="item" onClick = {handleLogOut}>Logout</Link>
+        )
+        }
+      </div>
+    </div>
+  </div>
+)
 }
 export {MenuBar};

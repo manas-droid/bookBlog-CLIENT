@@ -1,71 +1,28 @@
-import React , {createContext , useReducer} from 'react'
-import jwtDecode from 'jwt-decode';
-
-const initialState = {
-  user : null
-}
-
-if(localStorage.getItem('jwtToken')){
-const token = jwtDecode(localStorage.getItem('jwtToken'));
-
-if(token.exp * 1000 < Date.now()){
-    localStorage.removeItem('jwtToken');
-}
-else {
-  initialState.user = token
-}
-
-}
-
-
+import React , {createContext} from 'react';
+import {useQuery} from "@apollo/client";
+import {AUTH_ME} from '../utils/GraphQl';
 const AuthContext = createContext()
 
 
-function authReducer(state , action){
-  switch(action.type){
-      case "LOGIN" : return{
-        ...state,
-        user : action.payload
-      }
-      case "LOGOUT" : return{
-        ...state ,
-        user : null
-      }
-      default : return state
-  }
-}
-
 function AuthProvider(props){
-  const [state , dispatch] = useReducer(authReducer , initialState);
+const result = useQuery(AUTH_ME);
 
-  function login(userData){
-    localStorage.setItem("jwtToken" , userData.token);
-    dispatch({
-      type : 'LOGIN',
-      payload: userData
-    })
-  }
-  function logout(){
-    localStorage.removeItem("jwtToken");
-
-    dispatch({
-      type : "LOGOUT"
-    });
-  }
+if(result.loading)
+  return <h1>Loading ...</h1>;
 
   return (
     <AuthContext.Provider
         value={
             {
-              user : state.user,
-              login,
-              logout
+              user : (result.data) ? result.data.authMe : undefined
             }
         }
-
       {...props}
   />
-)
+);
+
+
+
 }
 
 

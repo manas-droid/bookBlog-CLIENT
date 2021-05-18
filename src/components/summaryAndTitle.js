@@ -3,7 +3,6 @@ import React from 'react';
 
 
 function SummaryAndTitle({bookname , summary , image}){
-
   return (
     <div className="subFlex1">
       <div className="bookname">
@@ -11,7 +10,7 @@ function SummaryAndTitle({bookname , summary , image}){
           {bookname}
         </h3>
       </div>
-      <img src= {image} alt={bookname}/>
+      {/* <img src= {image} alt={ bookname }/> */}
       <div className="summary">
             <p>
               { summary}

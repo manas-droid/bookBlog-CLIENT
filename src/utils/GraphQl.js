@@ -2,94 +2,66 @@
 import {gql} from '@apollo/client';
 
  export const YOUR_POSTS = gql `
- query ($userId : String!){
-     getUserPosts(userId : $userId){
-       _id
-       bookname
-       summary
-       createdAt
-       image
+ query{
+     getYourPosts{
+      id
+    imageUrl
+    description
+    bookname
+    likeCount
  }
  }`;
 
  export const DELETE_POST = gql `
-
  mutation(
-   $postId : String!
+   $postId : Int!
  ){
-   deletePost(postId : $postId)
+   deleteYourPosts(postId : $postId)
  }
  `;
 
 export const GET_POSTS = gql `
  query{
-   getPosts{
-     _id
-     bookname
-     summary
-     createdAt
-     image
-     username
-     likes {
-       username
-     }
-     comments {
-       username
-       createdAt
-       body
-     }
-     bookmarks{
-       username
-     }
-     tags
-   }
- }
- `;
- export const READ_QUERY = gql  `
- query($userId : String!){
-   getBookMarks(userId : $userId){
-     _id
-     bookname
-     image
-     summary
-     username
-     bookmarks{
-       username
-     }
+   getAllPosts{
+    id
+    imageUrl
+    description
+    bookname
+    username
+    likeCount
    }
  }
  `;
 
+
+ export const GET_BOOKMARK = gql`
+ query($postId : Int!)
+ {
+   getBookMarks(postId : $postId)
+ }
+ `;
+
+
 export const ADD_BOOKMARK = gql `
  mutation addBookMark(
-   $userId : String!
-   $postId : String!
+   $postId : Int!
  ){
-   addBookMark (userId : $userId  postId : $postId)
+   addBookMark (postId : $postId)
  }
  `;
 
 export const ADD_POST = gql `
- mutation insertPost(
+ mutation createPost(
    $bookname : String!
-   $summary  : String!
-   $tags     : String!
-   $image    : String
+   $description: String!
+   $imageUrl : String
  ){
-   insertPost (
-     insertpost :{
+   createPost (
+     input:{
        bookname : $bookname
-       summary  : $summary
-       tags     : $tags
-       image    : $image
-     }
-   ){
-     _id
-     bookname
-     summary
-     tags
-     image
-   }
+       description:$description
+       imageUrl : $imageUrl
+     })
 
  }
  `;
@@ -102,13 +74,7 @@ export const ADD_POST = gql `
    login(
        email : $email
        password : $password
-   ){
-     id
-     email
-     username
-     token
-     createdAt
-   }
+   )
  }
  ` ;
 export const REGISTER_USER = gql `
@@ -116,41 +82,23 @@ mutation register(
 $username : String!
 $email : String!
 $password : String!
-$confirmPassword: String!
 ){
   register(
-    registeration : {
       username : $username
       email : $email
       password : $password
-      confirmPassword : $confirmPassword
-    }
-  ){
-    id
-    email
-    username
-    createdAt
-  }
+  )
 }
 `
 export const SINGLE_POST = gql `
-  query ($postId : String!) {
-    getPost (postId : $postId){
+  query ($postId : Int!){
+    getSinglePost(postId : $postId){
         bookname
-        image
-        summary
+        imageUrl
+        description
+        commentCount
         username
-        likeCount
-        likes{
-           username
-           createdAt
-        }
-        comments{
-          id
-          username
-          body
-          createdAt
-        }
+        id
     }
   }
 `;
@@ -172,19 +120,18 @@ export const GET_POST_TO_EDIT = gql `
 
 
 export const INSERT_COMMENT = gql `
-mutation insertComment(
-$postId : String!
-$body : String!
+mutation addPostComment(
+$postId : Int!
+$parentId:Int
+$comment : String!
 ){
-  insertComment(
-      postId : $postId
-      body : $body
-  ){
-    _id
-    createdAt
-  }
+  addPostComment(
+      postId  : $postId
+      parentId:$parentId
+      comment : $comment
+  )
 }
-`
+`;
 
 export const DELETE_COMMENT = gql `
 mutation deleteComment(
@@ -196,13 +143,43 @@ $commentId: String!
       commentId : $commentId
   )
 }
-`
-export const INSERT_LIKES = gql `
-mutation insertLike(
-$postId : String!
+`;
+
+export const GET_COMMENTS = gql`
+query (
+  $postId:Int!
 ){
-  insertLike(postId : $postId)
+  getComments(postId:$postId){
+    comment
+    username
+    commentId
+  }
 }
+`;
+
+
+
+
+
+
+
+
+
+
+
+export const INSERT_LIKES = gql `
+mutation addLikes(
+$postId : Int!
+){
+  addLikes(postId : $postId)
+}
+`
+
+export const GET_LIKES = gql`
+query getLikes($postId : Int!){
+  getLikes(postId:$postId)
+}
+
 `
 
 
@@ -218,4 +195,44 @@ $summary  : String!
     summary  : $summary
   )
 }
+`;
+
+
+export const S3_SIGNATURE = gql`
+mutation s3Signature(
+$filename : String!
+$filetype:String!
+)
+{
+  s3Signature(filename:$filename  filetype:$filetype){
+    signedRequest
+    url
+  }
+}
+`;
+
+
+export const AUTH_ME = gql`
+  query{
+    authMe
+  }
+`; 
+
+
+export const GET_YOUR_BOOKMARKS = gql`
+  query{
+    getYourBookMarks{
+      id
+      bookname
+      description
+      imageUrl
+      likeCount
+    }
+  }
+`;
+
+export const LOGOUT = gql`
+  mutation{
+      logOut
+  }
 `;

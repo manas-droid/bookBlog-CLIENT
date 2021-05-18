@@ -1,33 +1,31 @@
-import React , {useContext} from 'react';
-import {gql , useQuery,useMutation} from '@apollo/client'
-import {AuthContext} from '../context/AuthContext'
-import PostComponent from '../components/PostComponent'
-
-import {READ_QUERY} from '../utils/GraphQl.js'
-
+import React from 'react';
+import {useQuery} from "@apollo/client";
+import {GET_YOUR_BOOKMARKS } from "../utils/GraphQl";
+import PostComponent from '../components/PostComponent';
 function BookMark(props){
+    const result = useQuery(GET_YOUR_BOOKMARKS);
 
-const {user} = useContext(AuthContext);
-const output = useQuery(READ_QUERY , {
-  variables : {userId : user.id}
-});
+    if(result.loading){
+        return <div>
+            loading ...
+            </div>
+    }
 
-if(!output.data || output.data && output.data.getBookMarks.length === 0){
-  return <h1 style = {{"margin" : "20px 60px" }}> You have no BookMarks ;(</h1>
+    const bookmarks = (result.data) ? result.data.getYourBookMarks : undefined;
+
+    if(bookmarks.length === 0) 
+        return <div> You have no bookmarks ;( </div>
+
+
+    return(
+        <div className="ui container text">
+                {
+                    bookmarks.map(b=>{
+                        return <PostComponent key={b.id}  {...b} {...props}/>
+                    })
+                }
+        </div>
+);
 }
-
-return (
-  <div className="allPosts">
-  {
-    output.data &&
-    output.data.getBookMarks.map(post=>{
-    return   <PostComponent key = {post._id} {...post} {...props} />;
-  })
-  }
-  </div>
-)
-
-}
-
 
 export default BookMark;
