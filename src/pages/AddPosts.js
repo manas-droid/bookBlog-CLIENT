@@ -98,8 +98,3 @@ async function  handleSubmit(e) {
 
 
 export default AddPosts;
-
-
-
-
-// 130019504204717

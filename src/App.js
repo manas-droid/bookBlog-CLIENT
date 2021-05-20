@@ -9,13 +9,11 @@ import {MenuBar} from './components/MenuBar'
 import SinglePost from './pages/SinglePost'
 import BookMark from './pages/BookMark'
 import EditPost from './pages/EditPost'
-import {AuthProvider} from './context/AuthContext';
 import {AuthRoute , LogRoute} from './utils/AuthRoute'
 import "./utils/color.css"
-import Sidebar from './components/SideBar'
+
 function App() {
   return (
-    <AuthProvider>
     <Router>
         <MenuBar/>
         <LogRoute exact path = '/login' component = {Login}/>
@@ -27,8 +25,6 @@ function App() {
         <AuthRoute exact path="/your-bookmarks" component = {BookMark}/>
         <AuthRoute exact path = "/editPost" component = {EditPost} />
     </Router>
-    </AuthProvider>
-
   );
 }
 

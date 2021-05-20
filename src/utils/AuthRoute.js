@@ -1,9 +1,9 @@
-import React , {useContext} from 'react'
+import React  from 'react'
 import {Route , Redirect} from 'react-router-dom'
-import {AuthContext} from '../context/AuthContext.js'
+import {useAuth0} from '@auth0/auth0-react'
 
 function AuthRoute({component : Component , ...rest}) {
-  const {user} = useContext(AuthContext);
+  const {user} = useAuth0();
 
   return (
     <Route
@@ -30,7 +30,7 @@ function AuthRoute({component : Component , ...rest}) {
 
 
 function LogRoute({component : Component , ...rest}){
-  const {user} = useContext(AuthContext);
+  const {user} = useAuth0();
   return (
     <Route
       {...rest}

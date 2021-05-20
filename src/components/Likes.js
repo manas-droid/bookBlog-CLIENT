@@ -3,10 +3,10 @@ import {Link} from "react-router-dom"
 import { useQuery , useMutation} from '@apollo/client';
 import {INSERT_LIKES , GET_LIKES} from '../utils/GraphQl';
 
-import{AuthContext}  from "../context/AuthContext" ;
+import{useAuth0}  from "@auth0/auth0-react" ;
  function Likes({postId , likeCount}){
 
-  const{user} = useContext(AuthContext);
+  const{user} = useAuth0();
 
   const [likes , setLikes] = useState('fa-heart-o');
   const [addLikes , __] =  useMutation(INSERT_LIKES);

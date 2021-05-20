@@ -1,32 +1,16 @@
 import {Link , useLocation} from 'react-router-dom';
-import {useContext} from 'react';
-import {useMutation} from '@apollo/client';
-import {AuthContext} from '../context/AuthContext'
-import {LOGOUT , AUTH_ME} from '../utils/GraphQl';
 import 'semantic-ui-css/semantic.min.css';
-import {useAuth0} from "../utils/auth";
+import {useAuth0} from "@auth0/auth0-react";
+
 
 function MenuBar(){
 
-  const {user} = useContext(AuthContext);
-  const{isAuthenticated , loading:authLoading , loginWithRedirect} = useAuth0();
+  const{ loginWithRedirect , logout , isAuthenticated} = useAuth0();
+  const user = isAuthenticated;
+  console.log(isAuthenticated);
 
   const currentLocation = useLocation().pathname;
 
-  console.log(currentLocation);
-
-  const [logOut ] = useMutation(LOGOUT , {
-    refetchQueries : [{
-      query : AUTH_ME
-    }]
-  });
-
-  async function handleLogOut (){
-    await logOut();
-
-  }
-
-  const activeItem = 'home';
 
   return (
     <div className="ui inverted segment">
@@ -44,14 +28,14 @@ function MenuBar(){
         }
       {
         !user && (
-          <Link className={`item ${currentLocation==='/login' ? "active" : ""}`} onClick = {loginWithRedirect}>Login</Link>
+          <Link className={`item ${currentLocation==='/login' ? "active" : ""}`} onClick = {()=>loginWithRedirect()}>Login</Link>
         )
       }  
       
       {
         user &&
         (
-          <Link to="/" className="item" onClick = {handleLogOut}>Logout</Link>
+          <Link to="/" className="item" onClick = {logout}>Logout</Link>
         )
         }
       </div>
